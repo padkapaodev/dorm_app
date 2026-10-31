@@ -215,7 +215,7 @@ with tab3:
                         <p style="margin: 0; font-size: 15px; color: #2e7d32; font-weight: bold;">ยอดรวมสุทธิที่ต้องชำระ</p>
                         <h1 style="margin: 3px 0 0 0; color: #c62828; font-size: 28px;">{current_bill['total_charge']:,.2f} บาท</h1>
                     </div>
-                    ,
+                    
                     <p style="text-align: center; font-size: 12px; color: #888; margin: 10px 0 0 0;">
                         ขอบคุณที่ใช้บริการค่ะ 🙏
                     </p>
@@ -224,8 +224,7 @@ with tab3:
             </html>
             """
             
-            # ขยายความสูงเป็น 580 พิกเซล ป้องกันขอบล่างโดนตัด
-            components.html(receipt_code, height=580, scrolling=False)
+            components.html(receipt_code, height=530, scrolling=False)
             st.markdown("<br>", unsafe_allow_html=True)
             
             # คำแนะนำการใช้งาน
