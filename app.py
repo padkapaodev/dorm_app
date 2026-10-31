@@ -119,66 +119,106 @@ with tab3:
             st.markdown("<br>", unsafe_allow_html=True)
             
             # -----------------------------------------------------------------
-            # ส่วนแสดงผลใบแจ้งหนี้ (ดีไซน์เน้นตัวใหญ่ อ่านง่าย สบายตาสำหรับผู้ใหญ่)
+            # ส่วนแสดงผลใบเสร็จ (ดีไซน์เน้นตัวใหญ่ อ่านง่าย สบายตาสำหรับผู้ใหญ่)
             # -----------------------------------------------------------------
-            receipt_html = f"""
-            <div style="
-                border: 3px solid #2E7D32; 
-                padding: 25px; 
-                border-radius: 15px; 
-                background-color: #ffffff; 
-                color: #222222;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-                font-family: sans-serif;
-                max-width: 600px;
-                margin: 0 auto;
-            ">
-                <div style="text-align: center;">
-                    <h2 style="color: #2E7D32; margin-bottom: 5px;">🏢 ใบแจ้งหนี้ค่าเช่าหอพัก</h2>
-                    <p style="color: #666; font-size: 14px; margin-top: 0;">ประจำงวดวันที่: <b>{current_bill['bill_date']}</b></p>
-                </div>
-                
-                <hr style="border: 1px solid #ddd; margin: 15px 0;">
-                
-                <div style="font-size: 18px; margin-bottom: 15px; background-color: #f1f8e9; padding: 10px 15px; border-radius: 8px;">
-                    🏠 <b>ห้องพักหมายเลข:</b> <span style="font-size: 24px; color: #1b5e20; font-weight: bold;">{current_bill['room_id']}</span><br>
-                    <span style="font-size: 13px; color: #555;">รหัสบิล: {current_bill['bill_id']}</span>
-                </div>
-                
-                <div style="font-size: 16px; line-height: 1.8;">
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 8px 0;">
-                        <span>🛏️ ค่าเช่าห้องพัก</span>
-                        <b>{current_bill['rent']:,.2f} บาท</b>
+            import streamlit.components.v1 as components
+
+            receipt_code = f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <style>
+                    body {{
+                        font-family: sans-serif;
+                        background-color: #ffffff;
+                        color: #222222;
+                        margin: 0;
+                        padding: 10px;
+                    }}
+                    .receipt-box {{
+                        border: 3px solid #2E7D32; 
+                        padding: 25px; 
+                        border-radius: 15px; 
+                        background-color: #ffffff; 
+                        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                        max-width: 550px;
+                        margin: 0 auto;
+                    }}
+                    .header {{
+                        text-align: center;
+                    }}
+                    .room-badge {{
+                        font-size: 18px; 
+                        margin-bottom: 15px; 
+                        background-color: #f1f8e9; 
+                        padding: 12px 15px; 
+                        border-radius: 8px;
+                    }}
+                    .row-item {{
+                        display: flex; 
+                        justify-content: space-between; 
+                        border-bottom: 1px dashed #eee; 
+                        padding: 10px 0;
+                        font-size: 16px;
+                    }}
+                    .total-box {{
+                        background-color: #e8f5e9; 
+                        padding: 15px; 
+                        border-radius: 10px; 
+                        text-align: center;
+                        margin-top: 15px;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="receipt-box">
+                    <div class="header">
+                        <h2 style="color: #2E7D32; margin: 0 0 5px 0;">🏢 ใบแจ้งหนี้ค่าเช่าหอพัก</h2>
+                        <p style="color: #666; font-size: 14px; margin: 0;">ประจำงวดวันที่: <b>{current_bill['bill_date']}</b></p>
                     </div>
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 8px 0;">
-                        <span>💧 ค่าน้ำ ({current_bill['water_unit_used']} หน่วย)</span>
-                        <b>{current_bill['water_charge']:,.2f} บาท</b>
+                    
+                    <hr style="border: 1px solid #ddd; margin: 15px 0;">
+                    
+                    <div class="room-badge">
+                        🏠 <b>ห้องพักหมายเลข:</b> <span style="font-size: 22px; color: #1b5e20; font-weight: bold;">{current_bill['room_id']}</span><br>
+                        <span style="font-size: 13px; color: #555;">รหัสบิล: {current_bill['bill_id']}</span>
                     </div>
-                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 8px 0;">
-                        <span>⚡ ค่าไฟ ({current_bill['elec_unit_used']} หน่วย)</span>
-                        <b>{current_bill['elec_charge']:,.2f} บาท</b>
+                    
+                    <div>
+                        <div class="row-item">
+                            <span>🛏️ ค่าเช่าห้องพัก</span>
+                            <b>{current_bill['rent']:,.2f} บาท</b>
+                        </div>
+                        <div class="row-item">
+                            <span>💧 ค่าน้ำ ({current_bill['water_unit_used']} หน่วย)</span>
+                            <b>{current_bill['water_charge']:,.2f} บาท</b>
+                        </div>
+                        <div class="row-item">
+                            <span>⚡ ค่าไฟ ({current_bill['elec_unit_used']} หน่วย)</span>
+                            <b>{current_bill['elec_charge']:,.2f} บาท</b>
+                        </div>
                     </div>
+                    
+                    <div class="total-box">
+                        <p style="margin: 0; font-size: 16px; color: #2e7d32; font-weight: bold;">ยอดรวมสุทธิที่ต้องชำระ</p>
+                        <h1 style="margin: 5px 0 0 0; color: #c62828; font-size: 30px;">{current_bill['total_charge']:,.2f} บาท</h1>
+                    </div>
+                    
+                    <p style="text-align: center; font-size: 12px; color: #888; margin: 15px 0 0 0;">
+                        ขอบคุณที่ใช้บริการค่ะ 🙏
+                    </p>
                 </div>
-                
-                <hr style="border: 2px solid #2E7D32; margin: 20px 0;">
-                
-                <div style="background-color: #e8f5e9; padding: 15px; border-radius: 10px; text-align: center;">
-                    <p style="margin: 0; font-size: 16px; color: #2e7d32; font-weight: bold;">ยอดรวมสุทธิที่ต้องชำระ</p>
-                    <h1 style="margin: 5px 0 0 0; color: #c62828; font-size: 32px;">{current_bill['total_charge']:,.2f} บาท</h1>
-                </div>
-                
-                <p style="text-align: center; font-size: 12px; color: #888; margin-top: 20px;">
-                    ขอบคุณที่ใช้บริการค่ะ 🙏
-                </p>
-            </div>
+            </body>
+            </html>
             """
             
-            # เรนเดอร์ใบเสร็จออกมาเป็นกล่องการ์ดสวยๆ
-            st.markdown(receipt_html, unsafe_allow_html=True)
+            # เรนเดอร์กล่องใบเสร็จ
+            components.html(receipt_code, height=520, scrolling=False)
             st.markdown("<br>", unsafe_allow_html=True)
             
-            # คำแนะนำการใช้งานสำหรับคุณแม่
-            st.info("💡 **วิธีส่งให้ผู้เช่า:** เพียงแคปเจอร์หน้าจอ (Screenshot) กรอบสีเขียวด้านบนนี้ แล้วส่งเข้า Line ห้องพักได้ทันที สะดวกและชัดเจนที่สุดครับ!")
+            # คำแนะนำการใช้งาน
+            st.info("💡 **วิธีส่งให้ผู้เช่า:** เพียงแคปเจอร์หน้าจอ (Screenshot) กรอบใบเสร็จด้านบนนี้ แล้วส่งเข้า Line ห้องพักได้ทันที สะดวกและชัดเจนที่สุดครับ!")
 
         else:
             st.warning("⚠️ ยังไม่มีข้อมูลใบแจ้งหนี้ใน Databricks Gold Layer")
