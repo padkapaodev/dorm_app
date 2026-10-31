@@ -116,7 +116,7 @@ with tab3:
             # ดึงข้อมูลของบิลที่เลือก
             current_bill = room_bills[room_bills["bill_id"] == selected_bill_id].iloc[0]
             
-            # แปลงวันที่เป็นชื่อเดือนภาษาไทย (เช่น 2026-09-01 -> กันยายน 2026)
+            # แปลงวันที่เป็นชื่อเดือนภาษาไทย
             bill_date_obj = pd.to_datetime(current_bill['bill_date'])
             thai_months = {
                 1: "มกราคม", 2: "กุมภาพันธ์", 3: "มีนาคม", 4: "เมษายน", 
@@ -124,13 +124,13 @@ with tab3:
                 9: "กันยายน", 10: "ตุลาคม", 11: "พฤศจิกายน", 12: "ธันวาคม"
             }
             month_name = thai_months.get(bill_date_obj.month, "")
-            year_th = bill_date_obj.year + 543 # แปลงเป็น พ.ศ. (หรือถ้าชอบ ค.ศ. เอา +543 ออกได้ครับ)
+            year_th = bill_date_obj.year + 543
             formatted_period = f"{month_name} {year_th}"
             
             st.markdown("<br>", unsafe_allow_html=True)
             
             # -----------------------------------------------------------------
-            # ส่วนแสดงผลใบเสร็จ (ดีไซน์เน้นตัวใหญ่ อ่านง่าย สบายตาสำหรับผู้ใหญ่)
+            # ส่วนแสดงผลใบเสร็จ (ปรับขนาดความสูงให้พอดี ไม่โดนตัดบนมือถือ)
             # -----------------------------------------------------------------
             import streamlit.components.v1 as components
 
@@ -145,11 +145,11 @@ with tab3:
                         background-color: #ffffff;
                         color: #222222;
                         margin: 0;
-                        padding: 10px;
+                        padding: 5px;
                     }}
                     .receipt-box {{
                         border: 3px solid #2E7D32; 
-                        padding: 25px; 
+                        padding: 20px; 
                         border-radius: 15px; 
                         background-color: #ffffff; 
                         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -160,40 +160,40 @@ with tab3:
                         text-align: center;
                     }}
                     .room-badge {{
-                        font-size: 18px; 
-                        margin-bottom: 15px; 
+                        font-size: 16px; 
+                        margin-bottom: 12px; 
                         background-color: #f1f8e9; 
-                        padding: 12px 15px; 
+                        padding: 10px 15px; 
                         border-radius: 8px;
                     }}
                     .row-item {{
                         display: flex; 
                         justify-content: space-between; 
                         border-bottom: 1px dashed #eee; 
-                        padding: 10px 0;
-                        font-size: 16px;
+                        padding: 8px 0;
+                        font-size: 15px;
                     }}
                     .total-box {{
                         background-color: #e8f5e9; 
-                        padding: 15px; 
+                        padding: 12px; 
                         border-radius: 10px; 
                         text-align: center;
-                        margin-top: 15px;
+                        margin-top: 12px;
                     }}
                 </style>
             </head>
             <body>
                 <div class="receipt-box">
                     <div class="header">
-                        <h2 style="color: #2E7D32; margin: 0 0 5px 0;">🏢 ใบแจ้งหนี้ค่าเช่าหอพัก</h2>
-                        <p style="color: #444; font-size: 16px; margin: 0; font-weight: bold;">ประจำเดือน {formatted_period}</p>
+                        <h2 style="color: #2E7D32; margin: 0 0 3px 0;">🏢 ใบแจ้งหนี้ค่าเช่าหอพัก</h2>
+                        <p style="color: #444; font-size: 15px; margin: 0; font-weight: bold;">ประจำเดือน {formatted_period}</p>
                     </div>
                     
-                    <hr style="border: 1px solid #ddd; margin: 15px 0;">
+                    <hr style="border: 1px solid #ddd; margin: 12px 0;">
                     
                     <div class="room-badge">
-                        🏠 <b>ห้องพักหมายเลข:</b> <span style="font-size: 22px; color: #1b5e20; font-weight: bold;">{current_bill['room_id']}</span><br>
-                        <span style="font-size: 13px; color: #555;">รหัสบิล: {current_bill['bill_id']}</span>
+                        🏠 <b>ห้องพักหมายเลข:</b> <span style="font-size: 20px; color: #1b5e20; font-weight: bold;">{current_bill['room_id']}</span><br>
+                        <span style="font-size: 12px; color: #555;">รหัสบิล: {current_bill['bill_id']}</span>
                     </div>
                     
                     <div>
@@ -212,11 +212,11 @@ with tab3:
                     </div>
                     
                     <div class="total-box">
-                        <p style="margin: 0; font-size: 16px; color: #2e7d32; font-weight: bold;">ยอดรวมสุทธิที่ต้องชำระ</p>
-                        <h1 style="margin: 5px 0 0 0; color: #c62828; font-size: 30px;">{current_bill['total_charge']:,.2f} บาท</h1>
+                        <p style="margin: 0; font-size: 15px; color: #2e7d32; font-weight: bold;">ยอดรวมสุทธิที่ต้องชำระ</p>
+                        <h1 style="margin: 3px 0 0 0; color: #c62828; font-size: 28px;">{current_bill['total_charge']:,.2f} บาท</h1>
                     </div>
-                    
-                    <p style="text-align: center; font-size: 12px; color: #888; margin: 15px 0 0 0;">
+                    ,
+                    <p style="text-align: center; font-size: 12px; color: #888; margin: 10px 0 0 0;">
                         ขอบคุณที่ใช้บริการค่ะ 🙏
                     </p>
                 </div>
@@ -224,8 +224,8 @@ with tab3:
             </html>
             """
             
-            # เรนเดอร์กล่องใบเสร็จ
-            components.html(receipt_code, height=520, scrolling=False)
+            # ขยายความสูงเป็น 580 พิกเซล ป้องกันขอบล่างโดนตัด
+            components.html(receipt_code, height=580, scrolling=False)
             st.markdown("<br>", unsafe_allow_html=True)
             
             # คำแนะนำการใช้งาน
