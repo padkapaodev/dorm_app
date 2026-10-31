@@ -116,6 +116,17 @@ with tab3:
             # ดึงข้อมูลของบิลที่เลือก
             current_bill = room_bills[room_bills["bill_id"] == selected_bill_id].iloc[0]
             
+            # แปลงวันที่เป็นชื่อเดือนภาษาไทย (เช่น 2026-09-01 -> กันยายน 2026)
+            bill_date_obj = pd.to_datetime(current_bill['bill_date'])
+            thai_months = {
+                1: "มกราคม", 2: "กุมภาพันธ์", 3: "มีนาคม", 4: "เมษายน", 
+                5: "พฤษภาคม", 6: "มิถุนายน", 7: "กรกฎาคม", 8: "สิงหาคม", 
+                9: "กันยายน", 10: "ตุลาคม", 11: "พฤศจิกายน", 12: "ธันวาคม"
+            }
+            month_name = thai_months.get(bill_date_obj.month, "")
+            year_th = bill_date_obj.year + 543 # แปลงเป็น พ.ศ. (หรือถ้าชอบ ค.ศ. เอา +543 ออกได้ครับ)
+            formatted_period = f"{month_name} {year_th}"
+            
             st.markdown("<br>", unsafe_allow_html=True)
             
             # -----------------------------------------------------------------
@@ -175,7 +186,7 @@ with tab3:
                 <div class="receipt-box">
                     <div class="header">
                         <h2 style="color: #2E7D32; margin: 0 0 5px 0;">🏢 ใบแจ้งหนี้ค่าเช่าหอพัก</h2>
-                        <p style="color: #666; font-size: 14px; margin: 0;">ประจำงวดวันที่: <b>{current_bill['bill_date']}</b></p>
+                        <p style="color: #444; font-size: 16px; margin: 0; font-weight: bold;">ประจำเดือน {formatted_period}</p>
                     </div>
                     
                     <hr style="border: 1px solid #ddd; margin: 15px 0;">
