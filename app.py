@@ -224,7 +224,7 @@ with tab3:
             </html>
             """
             
-            components.html(receipt_code, height=530, scrolling=False)
+            components.html(receipt_code, height=525, scrolling=False)
             st.markdown("<br>", unsafe_allow_html=True)
             
             # คำแนะนำการใช้งาน
