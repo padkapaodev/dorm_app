@@ -217,7 +217,7 @@ with tab3:
                     </div>
                     
                     <p style="text-align: center; font-size: 12px; color: #888; margin: 10px 0 0 0;">
-                        ชำระล่าช้า ปรับเพิ่มวันละ 50 บาท ค่ะ 🙏
+                        หากชำระล่าช้า ปรับเพิ่มวันละ 50 บาทค่ะ 🙏
                     </p>
                 </div>
             </body>
