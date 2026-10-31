@@ -96,39 +96,92 @@ with tab2:
         st.error(f"ไม่สามารถดึงข้อมูลได้: {e}")
 
 with tab3:
-    st.subheader("📊 ใบแจ้งหนี้และสรุปยอดค่าใช้จ่าย")
+    st.subheader("📊 ใบแจ้งหนี้และสร้างบิลรายห้อง")
+    st.caption("เลือกห้องและงวดบิลด้านล่างเพื่อดูใบแจ้งหนี้สำหรับแคปเจอร์ส่งให้ผู้เช่า")
     
-    col_btn1, col_btn2 = st.columns([1, 4])
-    with col_btn1:
-        if st.button("🔄 โหลดข้อมูล"):
-            st.cache_data.clear()
-            st.rerun()
-            
     try:
-        with st.spinner("กำลังดึงข้อมูลใบแจ้งหนี้"):
-            gold_df = load_gold_layer_bills()
-            
+        gold_df = load_gold_layer_bills()
+        
         if not gold_df.empty:
-            # แสดง KPI สรุปภาพรวม
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric(label="จำนวนบิลทั้งหมด", value=f"{len(gold_df)} รายการ")
-            with col2:
-                total_rev = gold_df["total_charge"].sum() if "total_charge" in gold_df.columns else 0
-                st.metric(label="ยอดเรียกเก็บรวม", value=f"{total_rev:,.2f} บาท")
-            with col3:
-                st.metric(label="แหล่งข้อมูล", value="Databricks Delta Table", delta="Gold Layer")
+            # สร้างตัวเลือกห้องพักแบบใช้งานง่าย
+            col_sel1, col_sel2 = st.columns(2)
+            with col_sel1:
+                available_rooms = sorted(gold_df["room_id"].unique())
+                selected_room = st.selectbox("🚪 เลือกห้องพัก", options=available_rooms, format_func=lambda x: f"ห้องพักที่ {x}")
+            with col_sel2:
+                # กรองเฉพาะบิลของห้องที่เลือก
+                room_bills = gold_df[gold_df["room_id"] == selected_room]
+                selected_bill_id = st.selectbox("📅 เลือกงวดประจำเดือน (Bill ID)", options=room_bills["bill_id"].unique())
+            
+            # ดึงข้อมูลของบิลที่เลือก
+            current_bill = room_bills[room_bills["bill_id"] == selected_bill_id].iloc[0]
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            
+            # -----------------------------------------------------------------
+            # ส่วนแสดงผลใบแจ้งหนี้ (ดีไซน์เน้นตัวใหญ่ อ่านง่าย สบายตาสำหรับผู้ใหญ่)
+            # -----------------------------------------------------------------
+            receipt_html = f"""
+            <div style="
+                border: 3px solid #2E7D32; 
+                padding: 25px; 
+                border-radius: 15px; 
+                background-color: #ffffff; 
+                color: #222222;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+                font-family: sans-serif;
+                max-width: 600px;
+                margin: 0 auto;
+            ">
+                <div style="text-align: center;">
+                    <h2 style="color: #2E7D32; margin-bottom: 5px;">🏢 ใบแจ้งหนี้ค่าเช่าหอพัก</h2>
+                    <p style="color: #666; font-size: 14px; margin-top: 0;">ประจำงวดวันที่: <b>{current_bill['bill_date']}</b></p>
+                </div>
                 
-            st.markdown("---")
+                <hr style="border: 1px solid #ddd; margin: 15px 0;">
+                
+                <div style="font-size: 18px; margin-bottom: 15px; background-color: #f1f8e9; padding: 10px 15px; border-radius: 8px;">
+                    🏠 <b>ห้องพักหมายเลข:</b> <span style="font-size: 24px; color: #1b5e20; font-weight: bold;">{current_bill['room_id']}</span><br>
+                    <span style="font-size: 13px; color: #555;">รหัสบิล: {current_bill['bill_id']}</span>
+                </div>
+                
+                <div style="font-size: 16px; line-height: 1.8;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 8px 0;">
+                        <span>🛏️ ค่าเช่าห้องพัก</span>
+                        <b>{current_bill['rent']:,.2f} บาท</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 8px 0;">
+                        <span>💧 ค่าน้ำ ({current_bill['water_unit_used']} หน่วย)</span>
+                        <b>{current_bill['water_charge']:,.2f} บาท</b>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 8px 0;">
+                        <span>⚡ ค่าไฟ ({current_bill['elec_unit_used']} หน่วย)</span>
+                        <b>{current_bill['elec_charge']:,.2f} บาท</b>
+                    </div>
+                </div>
+                
+                <hr style="border: 2px solid #2E7D32; margin: 20px 0;">
+                
+                <div style="background-color: #e8f5e9; padding: 15px; border-radius: 10px; text-align: center;">
+                    <p style="margin: 0; font-size: 16px; color: #2e7d32; font-weight: bold;">ยอดรวมสุทธิที่ต้องชำระ</p>
+                    <h1 style="margin: 5px 0 0 0; color: #c62828; font-size: 32px;">{current_bill['total_charge']:,.2f} บาท</h1>
+                </div>
+                
+                <p style="text-align: center; font-size: 12px; color: #888; margin-top: 20px;">
+                    ขอบคุณที่ใช้บริการค่ะ 🙏
+                </p>
+            </div>
+            """
             
-            # เพิ่มฟิลเตอร์กรองดูตามห้องพัก
-            selected_room = st.selectbox("กรองดูตามห้องพัก", options=["ทั้งหมด"] + list(gold_df["room_id"].unique()))
+            # เรนเดอร์ใบเสร็จออกมาเป็นกล่องการ์ดสวยๆ
+            st.markdown(receipt_html, unsafe_allow_html=True)
+            st.markdown("<br>", unsafe_allow_html=True)
             
-            filtered_df = gold_df if selected_room == "ทั้งหมด" else gold_df[gold_df["room_id"] == selected_room]
-            
-            st.dataframe(filtered_df, use_container_width=True)
+            # คำแนะนำการใช้งานสำหรับคุณแม่
+            st.info("💡 **วิธีส่งให้ผู้เช่า:** เพียงแคปเจอร์หน้าจอ (Screenshot) กรอบสีเขียวด้านบนนี้ แล้วส่งเข้า Line ห้องพักได้ทันที สะดวกและชัดเจนที่สุดครับ!")
+
         else:
-            st.info("ยังไม่มีข้อมูลในตาราง Gold Layer บน Databricks")
+            st.warning("⚠️ ยังไม่มีข้อมูลใบแจ้งหนี้ใน Databricks Gold Layer")
+            
     except Exception as e:
-        st.error(f"❌ ไม่สามารถเชื่อมต่อหรือดึงข้อมูลได้: {e}")
-        st.info("💡 คำแนะนำ: ตรวจสอบค่า `server_hostname`, `http_path` และ `access_token` ใน Streamlit Secrets ว่าถูกต้องครบถ้วนหรือไม่")
+        st.error(f"❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: {e}")
